@@ -1,3 +1,4 @@
+import { HDKey } from "@scure/bip32";
 import { Keypair } from "@solana/web3.js";
 import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 import { derivePath } from "ed25519-hd-key";
@@ -5,6 +6,7 @@ import { useState } from "react";
 import nacl from "tweetnacl";
 
 interface Wallet {
+  type: "solana" | "ethereum";
   publicKey: string;
   mnemonic: string;
 }
@@ -12,7 +14,7 @@ interface Wallet {
 const App = () => {
   const [wallet, setWallet] = useState<Wallet[]>([]);
 
-  const createWallet = () => {
+  const createSolanaWallet = () => {
     const mnemonic = generateMnemonic();
     const seed = mnemonicToSeedSync(mnemonic);
     const path = `m/44'/501'/${wallet.length}'/0'`;
@@ -23,10 +25,16 @@ const App = () => {
     setWallet((prev) => [
       ...prev,
       {
+        type: "solana",
         publicKey: keypair.publicKey.toBase58(),
         mnemonic,
       },
     ]);
+  };
+
+  const createEthWallet = () => {
+    const mnemonic = generateMnemonic();
+    const seed = mnemonicToSeedSync(mnemonic);
   };
 
   return (
@@ -40,7 +48,7 @@ const App = () => {
     >
       <h1>Generate Wallet</h1>
       <button
-        onClick={createWallet}
+        onClick={createSolanaWallet}
         style={{
           fontFamily: "Roboto Mono",
           padding: "12px 24px",
